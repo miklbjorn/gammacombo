@@ -54,8 +54,6 @@ IF (Boost_FOUND)
     INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 ENDIF()
 
-# find Doxygen
-FIND_PACKAGE(Doxygen)
 
 if(DOXYGEN_FOUND)
 	# add combiner modules to Doxygen
@@ -105,22 +103,12 @@ SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS} -O3 -g3")
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag(-std=c++11 HAS_CPP11)
 check_cxx_compiler_flag(-std=c++0x HAS_CPP11_ALTERNATIVE)
-check_cxx_compiler_flag(-std=c++14 HAS_CPP14)
-check_cxx_compiler_flag(-std=c++1y HAS_CPP14_ALTERNATIVE)
-
-if (HAS_CPP14)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-elseif (HAS_CPP14_ALTERNATIVE)
+if (HAS_CPP11)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+elseif (HAS_CPP11_ALTERNATIVE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 else()
-	message(WARNING "No C++14 support.")
-	if (HAS_CPP11)
-  		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-	elseif (HAS_CPP11_ALTERNATIVE)
-  		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-	else()
-  		message(FATAL_ERROR "No C++11 support.")
-  	endif()
+  message(FATAL_ERROR "No C++11 support.")
 endif()
 
 # set additional compiler flags

@@ -101,7 +101,7 @@ class PDF_Abs
 		inline void					setObservableSourceString(TString source){obsValSource=source;};
     inline void         setNObs(int val){ nObs = val; };
 		inline void         setTitle(TString t){title=t;};
-		void                setUncertainty(TString obsName, float stat, float syst);
+		void                setUncertainty(TString obsName, float stat = -1, float syst = -1);
 		virtual void        setUncertainties(TString c);
 		void                setSystCorrelation(TMatrixDSym &corSystMatrix);
 		void                storeErrorsInObs();

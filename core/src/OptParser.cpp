@@ -199,6 +199,7 @@ void OptParser::defineOptions()
   availableOptions.push_back("queue");
   availableOptions.push_back("randomizeToyVars");
   availableOptions.push_back("readfromfile");
+  availableOptions.push_back("readfromROOTfile");
   availableOptions.push_back("removeRange");
   availableOptions.push_back("save");
   availableOptions.push_back("saveAtMin");
@@ -581,6 +582,10 @@ void OptParser::parseArguments(int argc, char* argv[])
       "If 'default' is given, the default values are used."
       "This is not very 'safe'. It does not protect against doing stupid things so please be careful when using it!"
       "An example file is given in ../scripts/test_readin.dat", false, "string");
+  TCLAP::MultiArg<string> readfromROOTfileArg("", "readfromROOTfile", "Read the observables, uncertainties and correlations from a ROOT file - e.g. for reading in toys."
+      "If 'default' is given, the default values are used."
+      "This is not very 'safe'. It does not protect against doing stupid things so please be careful when using it!"
+      "So far only works for single PDF combiners (wohoo!)", false, "string");
 	TCLAP::MultiArg<string> titleArg("", "title", "Override the title of a combination. "
 			"If 'default' is given, the default title for that combination is used. "
             "If 'noleg' is given, this entry is not shown in the legend. "
@@ -690,6 +695,7 @@ void OptParser::parseArguments(int argc, char* argv[])
 	if ( isIn<TString>(bookedOptions, "relation" ) ) cmd.add(relationArg);
   if ( isIn<TString>(bookedOptions, "removeRange" ) ) cmd.add(removeRangeArg);
   if ( isIn<TString>(bookedOptions, "readfromfile" ) ) cmd.add(readfromfileArg);
+  if ( isIn<TString>(bookedOptions, "readfromROOTfile" ) ) cmd.add(readfromROOTfileArg);
   if ( isIn<TString>(bookedOptions, "randomizeToyVars" ) ) cmd.add(randomizeToyVarsArg);
 	if ( isIn<TString>(bookedOptions, "qh" ) ) cmd.add(qhArg);
   if ( isIn<TString>(bookedOptions, "queue") ) cmd.add(queueArg);
@@ -921,6 +927,11 @@ void OptParser::parseArguments(int argc, char* argv[])
   tmp = readfromfileArg.getValue();
   for ( int i=0; i < tmp.size(); i++ ) readfromfile.push_back(tmp[i]);
   for ( int i=tmp.size(); i<combid.size(); i++ ) readfromfile.push_back("default");
+  
+  // --readfromROOTfile
+  tmp = readfromROOTfileArg.getValue();
+  for ( int i=0; i < tmp.size(); i++ ) readfromROOTfile.push_back(tmp[i]);
+  for ( int i=tmp.size(); i<combid.size(); i++ ) readfromROOTfile.push_back("default");
 
 	// --title
 	tmp = titleArg.getValue();

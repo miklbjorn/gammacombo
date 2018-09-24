@@ -214,6 +214,6 @@ void BatchScriptWriter::writeScript(TString fname, TString outfloc, int jobn, Op
 
   if ( arg->queue != "" ) {
     //system(Form("bsub -R \"rusage[mem=40000]\" -q %s -o %s/%s.log %s/%s",arg->queue.Data(),cwd,fname.Data(),cwd,fname.Data()));
-    system(Form("bsub -q %s -o %s/%s.log %s/%s",arg->queue.Data(),cwd,fname.Data(),cwd,fname.Data()));
+    system(Form("qsub -q %s -o %s/%s.log %s/%s",arg->queue.Data(),cwd,fname.Data(),cwd,fname.Data()));
   }
 }

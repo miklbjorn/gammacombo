@@ -2,6 +2,9 @@
 #include "MethodDatasetsPluginScan.h"
 #include "MethodDatasetsProbScan.h"
 #include "PDF_Datasets.h"
+#include "RooArgList.h"
+#include "TFile.h"
+#include "RooMultiVarGaussian.h"
 
 GammaComboEngine::GammaComboEngine(TString name, int argc, char* argv[]):
   runOnDataSet(false)
@@ -1611,6 +1614,99 @@ void GammaComboEngine::tightenChi2Constraint(Combiner *c, TString scanVar)
 	pdf->buildPdf();
 }
 
+
+void GammaComboEngine::setObservablesFromROOTFile(Combiner *c, int cId){
+    if ( cId>=arg->readfromROOTfile.size() ) return;
+    if ( arg->readfromROOTfile[cId]==TString("default") ) return;
+    if ( arg->readfromROOTfile[cId]=="" ) return;
+
+    vector<PDF_Abs*> pdfs = c->getPdfs();
+    if (pdfs.size() > 1){
+        std::cout << "setObservablesFromROOTFile only works for (trivial ...) 1 pdf combiners! IGNORING!\n";
+        return;
+    }
+
+    TString file_name = arg->readfromROOTfile[cId];
+    std::cout << "Loading observables for:\n";
+    std::cout << "   combiner: " << c->getName() << std::endl;
+    std::cout << "   pdf     : " << pdfs[0]->getName() << std::endl;
+    std::cout << "From       : " << file_name << std::endl;
+
+    if (pdfs[0]->getName()!="ggszdpi"){
+        std::cout << "readfromROOTfile ONLY works for GGSZ Dpi at the moment. MAY CAUSE TROUBLE!\n";
+    }
+
+    std::vector<TString> par_names;
+    // {
+    //     "xm_dpi_obs",
+    //     "ym_dpi_obs",
+    //     "xp_dpi_obs",
+    //     "yp_dpi_obs"
+    // };
+
+    for (int i = 0; i <  pdfs[0]->getObservables()->getSize(); i++){
+        par_names.push_back(pdfs[0]->getObservables()->at(i)->GetName());
+        std::cout << pdfs[0]->getObservables()->at(i)->GetName() << std::endl;
+    }
+
+    std::map<TString, TString> par_name_map = {
+        {"xm_dpi_obs", "A_xm_dpi"},
+        {"ym_dpi_obs", "A_ym_dpi"},
+        {"xp_dpi_obs", "A_xp_dpi"},
+        {"yp_dpi_obs", "A_yp_dpi"},
+        {"xm_dk_obs", "A_xm_dk"},
+        {"ym_dk_obs", "A_ym_dk"},
+        {"xp_dk_obs", "A_xp_dk"},
+        {"yp_dk_obs", "A_yp_dk"},
+        {"xi_x_dpi_obs", "A_dpi_Re_xi"},
+        {"xi_y_dpi_obs", "A_dpi_Im_xi"}
+    };
+
+    auto file = new TFile(file_name);
+    auto fp = (RooArgList*)file->Get("floating_param");
+    auto full_corrmat = (TMatrixDSym*)file->Get("correlation_matrix");
+
+    std::vector <int> var_index_in_red_cov;
+    int i = 0;
+    for (auto const& v: par_names){
+        int index = fp->index(par_name_map[v]);
+        RooRealVar * var = (RooRealVar*)fp->at(index);
+        RooRealVar * old_var = (RooRealVar*)pdfs[0]->getObservables()->at(i++);
+        std::cout << "  " << v << " -> "<< var->getVal() << " +/- " << var->getError()
+            << " (was " << old_var->getVal() << " +/- " << old_var->getError() << ")" << std::endl;
+        var_index_in_red_cov.push_back(index);
+        
+        pdfs[0]->setObservable(v, var->getVal());
+        pdfs[0]->setUncertainty(v, var->getError());
+
+    }
+    std::vector <int> var_index_not_in_red_cov;
+    for (int i=0; i < fp->getSize(); i++){
+        if (std::find(var_index_in_red_cov.begin(), var_index_in_red_cov.end(), i)==var_index_in_red_cov.end())
+          var_index_not_in_red_cov.push_back(i);
+    }
+    
+    TMatrixDSym xy_correlation, S22;
+    TMatrixD S12, S21;
+    RooMultiVarGaussian::blockDecompose(*full_corrmat, var_index_in_red_cov, var_index_not_in_red_cov, xy_correlation, S12, S21, S22);
+    
+    std::cout << "Setting correlation to:\n";
+    xy_correlation.Print();
+
+    std::cout << "\n Was: :\n";
+    pdfs[0]->corStatMatrix.Print();
+
+
+    pdfs[0]->corStatMatrix = xy_correlation;
+
+    // Rebuild the PDF to take new values into account
+    pdfs[0]->storeErrorsInObs();
+    pdfs[0]->buildCov();
+    pdfs[0]->buildPdf();
+}
+
+
+
 // FIXME
 // WARNING - THIS FUNCTION ALLOWS YOU DO SOME INCREDIBLY STUPID THINGS
 //         - SO PLEASE BE CAREFUL WITH IT!
@@ -1619,6 +1715,7 @@ void GammaComboEngine::tightenChi2Constraint(Combiner *c, TString scanVar)
 ///
 void GammaComboEngine::setObservablesFromFile(Combiner *c, int cId)
 {
+
 
   if ( cId>=arg->readfromfile.size() ) return;
   if ( arg->readfromfile[cId]==TString("default") ) return;
@@ -1769,6 +1866,7 @@ void GammaComboEngine::scan()
 
     // read observable values, uncertainties and correlations from a file
     setObservablesFromFile(c, i);
+    setObservablesFromROOTFile(c, i);
 
 		// work with a clone - this way we can easily make plots with the
 		// same combination in twice (once with asimov, for example)

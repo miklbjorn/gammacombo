@@ -496,8 +496,13 @@ void PDF_Abs::setUncertainty(TString obsName, float stat, float syst)
 	for ( int i=0; i<nObs; i++ ){
 		RooRealVar* obs = (RooRealVar*)observables->at(i);
 		if ( TString(obs->GetName()).EqualTo(obsName) ){
-			StatErr[i] = stat;
-			SystErr[i] = syst;
+			// Allow for only setting one uncertainty by passing -1 (default) for the other
+			if (stat >= 0){
+				StatErr[i] = stat;
+			}
+			if (syst >= 0){
+				SystErr[i] = syst;
+			}
 			return;
 		}
 	}

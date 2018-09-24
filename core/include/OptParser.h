@@ -138,6 +138,7 @@ class OptParser
 		vector<int>   	qh;
     TString         queue;
     vector<TString> readfromfile;
+    vector<TString> readfromROOTfile;
 		vector<TString> relation;
 		bool 						runCLs;
     TString         save;

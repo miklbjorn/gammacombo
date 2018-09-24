@@ -117,6 +117,7 @@ class GammaComboEngine
 		void			scanDataSet();
 		void			setAsimovObservables(Combiner* c);
     void      setObservablesFromFile(Combiner *c, int cId);
+    void      setObservablesFromROOTFile(Combiner *c, int cId);
 		void			loadAsimovPoint(Combiner* c, int cId);
 		void			setUpPlot();
 		void      tightenChi2Constraint(Combiner *c, TString scanVar);
