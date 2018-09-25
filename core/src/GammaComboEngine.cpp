@@ -1658,8 +1658,8 @@ void GammaComboEngine::setObservablesFromROOTFile(Combiner *c, int cId){
         {"ym_dk_obs", "A_ym_dk"},
         {"xp_dk_obs", "A_xp_dk"},
         {"yp_dk_obs", "A_yp_dk"},
-        {"xi_x_dpi_obs", "A_dpi_Re_xi"},
-        {"xi_y_dpi_obs", "A_dpi_Im_xi"}
+        {"xi_x_dpi_obs", "A_Re_xi_dpi"},
+        {"xi_y_dpi_obs", "A_Im_xi_dpi"}
     };
 
     auto file = new TFile(file_name);
