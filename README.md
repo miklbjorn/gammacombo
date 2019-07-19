@@ -8,6 +8,11 @@ which is used to derive likelihood-based intervals and frequentist intervals
 based on pseudoexperiments following the Plugin method to handle nuisance
 parameters.
 
+This Version
+========
+This vesion has a few updates compared to the default version, to make it 
+run specific studies for a set of gammameasurements in LHCb.
+
 WebLink
 ======
 
