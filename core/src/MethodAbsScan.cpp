@@ -148,7 +148,7 @@ void MethodAbsScan::doInitialFit(bool force)
 	if ( startPars ) delete startPars;
 	startPars = new RooDataSet("startPars", "startPars", *w->set(parsName));
 	startPars->add(*w->set(parsName));
-
+    startPars->get(0)->Print("v");
 	// load parameter range
 	combiner->loadParameterLimits();
 

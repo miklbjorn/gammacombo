@@ -178,6 +178,7 @@ void OptParser::defineOptions()
 	availableOptions.push_back("ntoys");
 	availableOptions.push_back("nsmooth");
   availableOptions.push_back("origin");
+  availableOptions.push_back("output_base_name");
 	//availableOptions.push_back("pevid");
 	availableOptions.push_back("pr");
 	availableOptions.push_back("physrange");
@@ -395,6 +396,7 @@ void OptParser::parseArguments(int argc, char* argv[])
 			"Available IDs are 1-6. If not given, all control plots are made.", false, 0, "int");
 	TCLAP::ValueArg<int> digitsArg("s", "digits", "Set the number of printed"
 			" digits right of the decimal point. Default is automatic.", false, -1, "int");
+  TCLAP::ValueArg<string> output_base_nameArg("", "output_base_name", "override base name in output.",false, "","string");
   TCLAP::ValueArg<string> plotextArg("", "plotext", "Add an extension to the output plot name.",false, "","string");
 	TCLAP::ValueArg<string> plotlegArg("", "leg", "Adjust the plot legend.\n"
 			"Disable the legend with --leg off .\n"
@@ -721,6 +723,7 @@ void OptParser::parseArguments(int argc, char* argv[])
 	if ( isIn<TString>(bookedOptions, "pr" ) ) cmd.add( prArg );
 	if ( isIn<TString>(bookedOptions, "physrange" ) ) cmd.add(physrangeArg);
 	if ( isIn<TString>(bookedOptions, "pevid" ) ) cmd.add( pevidArg );
+  if ( isIn<TString>(bookedOptions, "output_base_name" ) ) cmd.add( output_base_nameArg );
   if ( isIn<TString>(bookedOptions, "origin" ) ) cmd.add( plotoriginArg );
   if ( isIn<TString>(bookedOptions, "nsmooth" ) ) cmd.add(nsmoothArg);
 	if ( isIn<TString>(bookedOptions, "ntoys" ) ) cmd.add(ntoysArg);
@@ -847,6 +850,7 @@ void OptParser::parseArguments(int argc, char* argv[])
 	nrun	            = nrunArg.getValue();
 	ntoys	            = ntoysArg.getValue();
   nsmooth           = nsmoothArg.getValue();
+    output_base_name = output_base_nameArg.getValue();
 	parevol           = parevolArg.getValue();
 	pevid             = pevidArg.getValue();
   plotext           = plotextArg.getValue();
@@ -931,7 +935,7 @@ void OptParser::parseArguments(int argc, char* argv[])
   // --readfromROOTfile
   tmp = readfromROOTfileArg.getValue();
   for ( int i=0; i < tmp.size(); i++ ) readfromROOTfile.push_back(tmp[i]);
-  for ( int i=tmp.size(); i<combid.size(); i++ ) readfromROOTfile.push_back("default");
+  // for ( int i=tmp.size(); i<combid.size(); i++ ) readfromROOTfile.push_back("default");
 
 	// --title
 	tmp = titleArg.getValue();

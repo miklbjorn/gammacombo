@@ -94,6 +94,7 @@ class OptParser
 		int		nrun;
 		int		ntoys;
     int   nsmooth;
+    TString output_base_name;
 		TString 	parsavefile;
 		bool		parevol;
 		vector<int>	pevid;

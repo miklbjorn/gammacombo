@@ -46,6 +46,8 @@ TString FileNameBuilder::getFileBaseName(const Combiner *c)
 	name += "_"+c->getName();
 	name += "_"+m_arg->var[0];
 	if ( m_arg->var.size()==2 ) name += "_"+m_arg->var[1];
+	// allow overriding the base name with option, useful for toys
+	if ( m_arg->output_base_name != "" ) name = m_arg->output_base_name;
 	return name;
 }
 TString FileNameBuilder::getFileBaseName(const MethodAbsScan *s)
